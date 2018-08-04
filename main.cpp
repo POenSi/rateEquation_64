@@ -14,10 +14,10 @@ int main() {
     double pulseSaveStartTime = switchTime;
     double pulseSaveStopTime = switchTime + 50e-9;
 
-    static int stepSkipping = 100000;
+    static int stepSkipping = 1e2;
     static int pulseStepSkipping = 1;
 
-    static unsigned long stepCount = 100000000;
+    static unsigned long stepCount = 1e4;
     double stepSize = time / stepCount;
     auto switchStep = (unsigned long) (switchTime / stepSize);
     auto pulseSaveStartStep = (unsigned long) (pulseSaveStartTime / stepSize);
@@ -105,16 +105,6 @@ int main() {
 
     }
 
-    ofstream nFile;
-    ofstream n1File;
-    ofstream n2File;
-    ofstream photonsFile;
-    ofstream pulsePhotonsFile;
-    nFile.open("n.txt");
-    n1File.open("n1.txt");
-    n2File.open("n2.txt");
-    photonsFile.open("photons.txt");
-    pulsePhotonsFile.open("pulsePhotonsFile.txt");
 
 
     const clock_t start = clock();
@@ -164,26 +154,6 @@ int main() {
     cout << "calculation time " << milliSecondsElapsed << " ms";
 
 
-    for (unsigned long step = 0; step < (stepCount - stepSkipping); step = step + stepSkipping) {
-        nFile << step << "\t" << n[step] << "\n";
-        n1File << step << "\t" << n1[step] << "\n";
-        n2File << step << "\t" << n2[step] << "\n";
-        photonsFile << step << "\t" << photonsInResonator[step] << "\n";
-    }
-
-
-    for (unsigned long step = pulseSaveStartStep;
-         step < (pulseSaveStopStep - pulseStepSkipping); step = step + pulseStepSkipping) {
-        pulsePhotonsFile << step << "\t" << photonsInResonator[step] << "\n";
-    }
-
-
-    nFile.close();
-    n1File.close();
-    n2File.close();
-    photonsFile.close();
-    pulsePhotonsFile.close();
-
     free(n);
     free(n1);
     free(n2);
@@ -191,3 +161,63 @@ int main() {
 
     return 0;
 }
+
+/*void nSave() {
+
+ofstream n1File;
+ofstream n2File;
+ofstream photonsFile;
+ofstream pulsePhotonsFile;
+
+n1File.open("n1.txt");
+n2File.open("n2.txt");
+photonsFile.open("photons.txt");
+pulsePhotonsFile.open("pulsePhotonsFile.txt");
+
+
+for (
+unsigned long step = 0;
+step < (stepCount - stepSkipping);
+step = step + stepSkipping
+) {
+n1File << step << "\t" << n1[step] << "\n";
+n2File << step << "\t" << n2[step] << "\n";
+photonsFile << step << "\t" << photonsInResonator[step] << "\n";
+}
+
+
+for (
+unsigned long step = pulseSaveStartStep;
+step < (pulseSaveStopStep - pulseStepSkipping);
+step = step + pulseStepSkipping
+) {
+pulsePhotonsFile << step << "\t" << photonsInResonator[step] << "\n";
+}
+
+
+ofstream nFile;
+nFile.open("n.txt");
+nFile.
+
+close();
+
+
+n1File.
+
+close();
+
+n2File.
+
+close();
+
+photonsFile.
+
+close();
+
+pulsePhotonsFile.
+
+close();
+
+
+}
+ */
