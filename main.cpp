@@ -3,6 +3,8 @@
 #include <fstream>
 #include <ctime>
 
+typedef double d;
+typedef d d1;
 using namespace std;
 
 int main() {
@@ -34,7 +36,7 @@ int main() {
     double relaxationTime = 200e-12;
     double aeLength = 75e-3;
     double pumpDiameter = 5e-3;
-    double lasingModeDiameter = 4e-3;
+    double lasingModeDiameter = 5e-3;
     double aeRefractionIndex = 1.819;
     double speedOfLight = 299792458;
     double planckConstant = 6.626070e-34;
@@ -46,7 +48,7 @@ int main() {
     double absorbedPumpPower = singleMatrixPower * numberOfMatrix * pumpAbsorptionCoefficient;
     double pumpPowerInLasingMode = absorbedPumpPower * (pow(lasingModeDiameter / pumpDiameter, 2));
     double luminescenceEfficiency = 1e-2;
-    double amplifiedLuminescenceCoefficient = 1e-95;
+    double amplifiedLuminescenceCoefficient = 1e-105;
 
     double geometricResonatorLength = 0.8;
     double equivalentResonatorLength = geometricResonatorLength + (aeRefractionIndex - 1) * aeLength;
@@ -57,10 +59,10 @@ int main() {
     double pumpRate = pumpPowerInLasingMode / (planckConstant * pumpFrequency) / lasingModeVolume / concentration;
 
 
-    double exitMirrorReflection = 0.4;
+    double exitMirrorReflection = 0.2;
     double backMirrorReflection = 0.995;
-    double internalLoss = 0.01;//single pass
-    double closedSwitchInternalLoss = 0.9;//single pass
+    double internalLoss = 0.001;//single pass
+    double closedSwitchInternalLoss = 0.995;//single pass
     double logarithmicRoundTripLoss =
             (-log(exitMirrorReflection) + (-log(backMirrorReflection)) + (-log(1 - internalLoss))) / 2;
     cout << "logarithmicRoundTripLoss " << logarithmicRoundTripLoss << "\n";
@@ -166,7 +168,8 @@ int main() {
 
 
     double photonsToWattCoefficient =
-            PI * pow(lasingModeDiameter, 2) / 4 * planckConstant * lasingFrequency * (1 - exitMirrorReflection);
+            planckConstant * lasingFrequency * (1 - exitMirrorReflection) /
+            photonInResonatorLifeTime;
 
     double pulseIntegral = 0;
     for (unsigned long step = pulseSaveStartStep;
@@ -177,8 +180,8 @@ int main() {
         pulsePhotonsFile << step << "\t" << pulsePower << "\n";
     }
 
-    double pulseEnergy = pulseIntegral * stepSize;
-    cout << "energy " << pulseEnergy << " J\n";
+    double pulseEnergy = pulseIntegral;
+    cout << "energy " << pulseEnergy * stepSize << " J\n";
 
     for (unsigned long step = 0;
          step < (stepCount - stepSkipping);
