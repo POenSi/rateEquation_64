@@ -36,7 +36,7 @@ int main() {
     double relaxationTime = 200e-12;
     double aeLength = 75e-3;
     double pumpDiameter = 5e-3;
-    double lasingModeDiameter = 5e-3;
+    double lasingModeDiameter = 4.8e-3;
     double aeRefractionIndex = 1.819;
     double speedOfLight = 299792458;
     double planckConstant = 6.626070e-34;
@@ -48,7 +48,9 @@ int main() {
     double absorbedPumpPower = singleMatrixPower * numberOfMatrix * pumpAbsorptionCoefficient;
     double pumpPowerInLasingMode = absorbedPumpPower * (pow(lasingModeDiameter / pumpDiameter, 2));
     double luminescenceEfficiency = 1e-2;
-    double amplifiedLuminescenceCoefficient = 1e-105;
+    double amplifiedLasingLuminescenceCoefficient = 1e-5;
+    double amplifiedNonLasingCoefficient = 1e-5;
+
 
     double geometricResonatorLength = 0.8;
     double equivalentResonatorLength = geometricResonatorLength + (aeRefractionIndex - 1) * aeLength;
@@ -59,10 +61,10 @@ int main() {
     double pumpRate = pumpPowerInLasingMode / (planckConstant * pumpFrequency) / lasingModeVolume / concentration;
 
 
-    double exitMirrorReflection = 0.2;
+    double exitMirrorReflection = 0.04;
     double backMirrorReflection = 0.995;
-    double internalLoss = 0.001;//single pass
-    double closedSwitchInternalLoss = 0.995;//single pass
+    double internalLoss = 0.08;//single pass
+    double closedSwitchInternalLoss = 0.99999;//single pass
     double logarithmicRoundTripLoss =
             (-log(exitMirrorReflection) + (-log(backMirrorReflection)) + (-log(1 - internalLoss))) / 2;
     cout << "logarithmicRoundTripLoss " << logarithmicRoundTripLoss << "\n";
@@ -95,15 +97,16 @@ int main() {
         n2[step] = n2[step - 1] + (pumpRate * n1[step - 1] -
                                    B * photonsInResonator[step - 1] * n2[step - 1] -
                                    n2[step - 1] * fluorescenceLifeTime *
-                                   amplifiedLuminescenceCoefficient -
+                                   amplifiedLasingLuminescenceCoefficient -
                                    n2[step - 1] * fluorescenceLifeTime) * stepSize;
         n1[step] = concentration - n2[step];
         photonsInResonator[step] = photonsInResonator[step - 1] +
                                    (lasingModeVolume * B *
-                                    photonsInResonator[step - 1] * n2[step - 1] +
+                                    n2[step - 1] +
                                     n2[step - 1] * fluorescenceLifeTime *
-                                    amplifiedLuminescenceCoefficient -
-                                    photonsInResonator[step - 1] / photonInResonatorLifeTimeCurrent) * stepSize;
+                                    amplifiedLasingLuminescenceCoefficient -
+                                    1 / photonInResonatorLifeTimeCurrent) *
+                                   photonsInResonator[step - 1] * stepSize;
 
     }
 
@@ -139,7 +142,6 @@ int main() {
 
     double pulseDuration = pulseDurationInSteps * stepSize;
     cout << "pulseDuration " << pulseDuration * 1e9 << " ns.\n";
-    cout << "maximum " << maximum << " position " << maximumPosition * stepSize * 1e9 << " ns.\n";
 
 
     double pulseDelay = (maximumPosition - switchStep) * stepSize;
